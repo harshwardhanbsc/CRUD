@@ -1,0 +1,283 @@
+﻿<html data-ng-app="crudModule">  
+@{  
+    ViewBag.Title = "Manage Student Information using AngularJs, WEB API & MVC4";  
+}  
+  
+<body>  
+    <table id="tblContainer" data-ng-controller="CRUD_OperController">  
+        <tr>  
+            <td>  
+                <table style="border: solid 2px Green; padding: 5px;">  
+                    <tr style="height: 30px; background-color: skyblue; color: maroon;">  
+                        <th></th>  
+                        <th>ID</th>  
+                        <th>Name</th>  
+                        <th>Email</th>  
+                        <th>Class</th>  
+                      
+                        <th>City</th>  
+                        <th>Country</th>  
+                        <th></th>  
+                        <th></th>  
+                    </tr>  
+                    <tbody data-ng-repeat="stud in Students">  
+                        <tr>
+                            <td></td>  
+                            <td><span>{{stud.studentID}}</span></td>  
+                            <td><span>{{stud.Name}}</span></td>  
+                            <td><span>{{stud.Email}}</span></td>  
+                            <td><span>{{stud.Class}}</span></td>  
+                           
+                            <td><span>{{stud.City}}</span></td>  
+                            <td><span>{{stud.Country}}</span></td>  
+                            <td>  
+                                <input type="button" id="Edit" value="Edit" data-ng-click="get(stud)" /></td>  
+  
+                            <td>  
+                                <input type="button" id="Delete" value="Delete" data-ng-click="delete(stud)" /></td>  
+                        </tr>  
+                    </tbody>  
+                </table>  
+  
+            </td>  
+        </tr>  
+        <tr>  
+            <td>  
+                <div style="color: red;">{{Message}}</div>  
+                <table>  
+                    <tr>  
+                        <td></td>  
+                        <td>  
+                            <span>Student Name</span>  
+                        </td>  
+                        <td>  
+                            <input type="text" id="sName" required data-ng-model="Name" />  
+                        </td>  
+                    </tr>  
+                    <tr>  
+                        <td></td>  
+                        <td>  
+                            <span>Email</span>  
+                        </td>  
+                        <td>  
+                            <input type="text" id="sEmail" required data-ng-model="Email" />  
+                        </td>  
+                    </tr>  
+                    <tr>  
+                        <td></td>  
+                        <td>  
+                            <span>Class</span>  
+                        </td>  
+                        <td>  
+                            <input type="text" id="sClass" required data-ng-model="Class" />  
+                        </td>  
+                    </tr>                   
+                    <tr>  
+                        <td></td>  
+                        <td>  
+                            <span>City</span>  
+                        </td>  
+                        <td>  
+                            <input type="text" id="sCity" required data-ng-model="City" />  
+                        </td>  
+                    </tr>  
+                    <tr>  
+                        <td></td>  
+                        <td>  
+                            <span>Country</span>  
+                        </td>  
+                        <td>  
+                            <input type="text" id="sCountry" required data-ng-model="Country" />  
+                        </td>  
+                    </tr>  
+                    <tr>  
+                        <td></td>  
+                        <td></td>  
+                        <td>  
+                            <input type="button" id="save" value="Save" data-ng-click="save()" />  
+  
+                            <input type="button" id="Clear" value="Clear" data-ng-click="clear()" />  
+                        </td>  
+                    </tr>  
+                </table>  
+  
+            </td>  
+        </tr>  
+  
+    </table>  
+</body>  
+</html> 
+<script src="~/Scripts/angular.min.js"></script>
+<script src="~/Scripts/angular-route.min.js"></script>
+<script>
+    /* create a app module  */
+   
+    (function () {
+
+        var app = angular.module("crudModule", []);
+    })()
+    /* ENd app module  */
+
+    /* create a service module  */
+
+    app.service('CRUD_OperService', function ($http)
+    {
+
+        //Create new record  
+        this.post = function (Student)
+        {
+            var request = $http
+                ({
+                method: "post",
+                url: "/api/StudentAPI",
+                data: Student
+                 });
+            return request;
+        }
+
+        //Get Single Records  
+        this.get = function (studentID) {
+            return $http.get("/api/StudentAPI/" + studentID);
+        }
+
+        //Get All Student  
+        this.getAllStudent = function () {
+            return $http.get("/api/StudentAPI");
+        }
+
+        //Update the Record  
+        this.put = function (studentID, Student) {
+            var request = $http({
+                method: "put",
+                url: "/api/StudentAPI/" + studentID,
+                data: Student
+            });
+            return request;
+        }
+
+        //Delete the Record  
+        this.delete = function (studentID)
+        {
+            var request = $http({
+                method: "delete",
+                url: "/api/StudentAPI/" + studentID
+            });
+            return request;
+        }
+    });
+
+    /* END  service module  */
+
+    /* create a controller module  */
+    app.controller('CRUD_OperController', function ($scope, CRUD_OperService)
+    {
+        $scope.OperType = 1;
+        //1 Mean New Entry  
+
+        GetAllRecords();
+        //To Get All Records  
+        function GetAllRecords() {
+            var promiseGet = CRUD_OperService.getAllStudent();
+            promiseGet.then(function (pl) { $scope.Students = pl.data },
+                  function (errorPl) {
+                      $log.error('Some Error in Getting Records.', errorPl);
+                  });
+        }
+
+        //To Clear all input controls.  
+        function ClearModels() {
+            $scope.OperType = 1;
+            $scope.StudentID = "";
+            $scope.Name = "";
+            $scope.Email = "";
+            $scope.Class = "";
+            $scope.EnrollYear = "";
+            $scope.City = "";
+            $scope.Country = "";
+        }
+
+        //To Create new record and Edit an existing Record.  
+        $scope.save = function () {
+            var Student = {
+                Name: $scope.Name,
+                Email: $scope.Email,
+                Class: $scope.Class,
+                EnrollYear: $scope.EnrollYear,
+                City: $scope.City,
+                Country: $scope.Country
+            };
+            if ($scope.OperType === 1) {
+                var promisePost = CRUD_OperService.post(Student);
+                promisePost.then(function (pl) {
+                    $scope.StudentID = pl.data.StudentID;
+                    GetAllRecords();
+                    ClearModels();
+                }, function (err) {
+                    console.log("Err" + err);
+                });
+            } else
+            {
+                //Edit the record                
+                Student.StudentID = $scope.StudentID;
+                var promisePut = CRUD_OperService.put($scope.StudentID, Student);
+                promisePut.then(function (pl) {
+                    $scope.Message = "Student Updated Successfuly";
+                    GetAllRecords();
+                    ClearModels();
+                }, function (err)
+                {
+                    console.log("Err" + err);
+                });
+            }
+        };
+
+        //To Delete Record  
+        $scope.delete = function (Student)
+        {
+            var promiseDelete = CRUD_OperService.delete(Student.studentID);
+            promiseDelete.then(function (pl) {
+                $scope.Message = "Student Deleted Successfuly";
+                GetAllRecords();
+                ClearModels();
+            }, function (err) {
+                console.log("Err" + err);
+            });
+        }
+
+        //To Get Student Detail on the Base of Student ID  
+        $scope.get = function (Student) {
+            var promiseGetSingle = CRUD_OperService.get(Student.studentID);
+
+            promiseGetSingle.then(function (pl) {
+                var res = pl.data;
+                $scope.StudentID = res.studentID;
+                $scope.Name = res.Name;
+                $scope.Email = res.Email;
+                $scope.Class = res.Class;
+                $scope.EnrollYear = res.EnrollYear;
+                $scope.City = res.City;
+                $scope.Country = res.Country;
+
+                $scope.OperType = 0;
+            },
+                      function (errorPl) {
+                          console.log('Some Error in Getting Details', errorPl);
+                      });
+        }
+
+        //To Clear all Inputs controls value.  
+        $scope.clear = function () {
+            $scope.OperType = 1;
+            $scope.studentID = "";
+            $scope.Name = "";
+            $scope.Email = "";
+            $scope.Class = "";
+            $scope.EnrollYear = "";
+            $scope.City = "";
+            $scope.Country = "";
+        }
+
+    });
+    /* END  controller module  */
+
+</script>
