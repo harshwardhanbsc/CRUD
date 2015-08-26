@@ -1,6 +1,6 @@
 ﻿<html data-ng-app="crudModule">  
 @{  
-    ViewBag.Title = "Manage Student Information using AngularJs, WEB API & MVC4";  
+    ViewBag.Title = "Manage Student Information" ;  
 }  
   
 <body>  
@@ -45,6 +45,15 @@
             <td>  
                 <div style="color: red;">{{Message}}</div>  
                 <table>  
+                  @*  <tr>  
+                        <td></td>  
+                        <td>  
+                            <span>Student ID</span>  
+                        </td>  
+                        <td>  
+                            <input type="text" id="StudentID" readonly="readonly" data-ng-model="studentID" />  
+                        </td>  
+                    </tr>  *@
                     <tr>  
                         <td></td>  
                         <td>  
@@ -71,7 +80,16 @@
                         <td>  
                             <input type="text" id="sClass" required data-ng-model="Class" />  
                         </td>  
-                    </tr>                   
+                    </tr>  
+                  @*  <tr>  
+                        <td></td>  
+                        <td>  
+                            <span>Enrollement Year</span>  
+                        </td>  
+                        <td>  
+                            <input type="text" id="sEnrollYear" required data-ng-model="EnrollYear" />  
+                        </td>  
+                    </tr>  *@
                     <tr>  
                         <td></td>  
                         <td>  
@@ -111,10 +129,9 @@
 <script src="~/Scripts/angular-route.min.js"></script>
 <script>
     /* create a app module  */
-   
+    var app;
     (function () {
-
-        var app = angular.module("crudModule", []);
+        app = angular.module("crudModule", []);
     })()
     /* ENd app module  */
 
